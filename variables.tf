@@ -93,12 +93,13 @@ variable "subnets" {
 
 
 variable "subscription_id" {
-  default = "10453ec5-bcb7-4ed7-9f6c-4e741f3611a8"
+  default = "<your-subscription-id-here>"
   description = "provide the subscription where you provision put this vnet"
   type = string
 }
+
 variable "rg_name" {
-  default = "MyResourceGroup"
+  default = "<your-resource-group-name-here>"
   description = "name of resource group where you wanna provision the vnet"
   type = string
 }
