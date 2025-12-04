@@ -1,23 +1,21 @@
 variable "location" {
-  default = "spaincentral"
-  type = string
-  description = ""
+  type        = string
+  description = "Azure region where the virtual network will be deployed (e.g., 'East US')"
 }
 
-
 variable "vnet_name" {
-  default = "my-vnet"
+  type        = string
+  description = "Name of the virtual network to create"
 }
 
 variable "vnet_cidr" {
-  type = string
-  default = "10.0.0.0/16"
+  type        = string
+  description = "CIDR block for the virtual network (e.g., '10.0.0.0/16')"
 }
 
 variable "subnets" {
   type = map(object({
     new_bits = number
-
 
     # NSG per subnet: name + list of rules
     nsg = object({
@@ -35,71 +33,25 @@ variable "subnets" {
       }))
     })
   }))
-
-  default = {
-    "public-subnet" = {
-      new_bits = 8
-      nsg = {
-        name = "nsg-public"
-        rules = [
-          {
-            name                       = "Allow-HTTP"
-            priority                   = 100
-            direction                  = "Inbound"
-            access                     = "Allow"
-            protocol                   = "Tcp"
-            source_port_range          = "*"
-            destination_port_range     = "80"
-            source_address_prefix      = "*"
-            destination_address_prefix = "*"
-          },
-          {
-            name                       = "Allow-HTTPS"
-            priority                   = 110
-            direction                  = "Inbound"
-            access                     = "Allow"
-            protocol                   = "Tcp"
-            source_port_range          = "*"
-            destination_port_range     = "443"
-            source_address_prefix      = "*"
-            destination_address_prefix = "*"
-          }
-        ]
-      }
-    }
-
-    "private-subnet" = {
-      new_bits = 8
-      nsg = {
-        name = "nsg-private"
-        rules = [
-          {
-            name                       = "Deny-Internet"
-            priority                   = 100
-            direction                  = "Outbound"
-            access                     = "Deny"
-            protocol                   = "*"
-            source_port_range          = "*"
-            destination_port_range     = "*"
-            source_address_prefix      = "*"
-            destination_address_prefix = "Internet"
-          }
-        ]
-      }
-    }
-  }
+  description = "Map of subnets to create in the virtual network. Each subnet includes new_bits for subnetting and optional NSG configuration"
 }
 
-
-
 variable "subscription_id" {
-  default = "<your-subscription-id-here>"
-  description = "provide the subscription where you provision put this vnet"
-  type = string
+  default     = "<your-subscription-id-here>"
+  description = "Azure subscription ID where the virtual network will be provisioned"
+  type        = string
 }
 
 variable "rg_name" {
-  default = "<your-resource-group-name-here>"
-  description = "name of resource group where you wanna provision the vnet"
-  type = string
+  default     = "<your-resource-group-name-here>"
+  description = "Name of the Azure resource group where the virtual network will be created"
+  type        = string
 }
+
+variable "organization_name" {
+  type        = string
+}
+variable "rg_workspace_name" {
+  type        = string
+}
+

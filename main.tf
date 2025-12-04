@@ -19,6 +19,16 @@ resource "random_pet" "vnet_suffix" {
   separator = "-"
 }
 
+locals {
+  vnet_subnets = {
+    for s in module.subnets.networks :
+    s.name => {
+      name             = s.name
+      address_prefixes = [s.cidr_block]
+    }
+  }
+}
+
 
 module "avm-res-network-virtualnetwork" {
   source = "Azure/avm-res-network-virtualnetwork/azurerm"
@@ -26,15 +36,22 @@ module "avm-res-network-virtualnetwork" {
   address_space = [var.vnet_cidr]
   location      = var.location
   name          = "${var.vnet_name}-${var.location}-${random_pet.vnet_suffix.id}"
-  parent_id     = "/subscriptions/${var.subscription_id}/resourceGroups/${var.rg_name}"
+  parent_id     = data.terraform_remote_state.rg.outputs.resource_group_id
 
-  subnets = {
-  for s in module.subnets.networks :
-  s.name => {
-    name             = s.name
-    address_prefixes = [s.cidr_block]
-  }
-  }
+  subnets = local.vnet_subnets
 }
 
 
+
+data "terraform_remote_state" "rg" {
+  backend = "remote"
+
+  config = {
+    organization = var.organization_name
+    workspaces = {
+      name = var.rg_workspace_name
+    }
+  }
+
+
+}
